@@ -4,7 +4,7 @@ def GetNextFreePort() {
 }
 
 def StartContainer() {
-    bat "docker run -e \"ACCEPT_EULA=Y\" -e \"SA_PASSWORD=P@ssword1\" --name SQLLinux${BRANCH_NAME} -d -i -p ${PORT_NUMBER}:1433 microsoft/mssql-server-linux:2017-GA"    
+    bat "docker run -e \"ACCEPT_EULA=Y\" -e \"SA_PASSWORD=P@ssword1\" --name ${CONTAINER_NAME} -d -i -p ${PORT_NUMBER}:1433 microsoft/mssql-server-linux:2017-GA"    
     powershell "While (\$((docker logs SQLLinux${BRANCH_NAME} | select-string ready | select-string client).Length) -eq 0) { Start-Sleep -s 1 }"    
     bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -Q \"EXEC sp_configure 'show advanced option', '1';RECONFIGURE\""
     bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -Q \"EXEC sp_configure 'clr enabled', 1;RECONFIGURE\""
@@ -12,7 +12,7 @@ def StartContainer() {
 }
 
 def RemoveContainer() {
-    powershell "If (\$((docker ps -a --filter \"name=SQLLinux${BRANCH_NAME}\").Length) -eq 2) { docker rm -f SQLLinux${BRANCH_NAME} }"
+    powershell "If (\$((docker ps -a --filter \"name=${CONTAINER_NAME}\").Length) -eq 2) { docker rm -f ${CONTAINER_NAME} }"
 }
 
 def DeployDacpac() {
@@ -32,8 +32,9 @@ pipeline {
     agent any
     
     environment {
-        PORT_NUMBER = GetNextFreePort()
-        SCM_PROJECT = GetScmProjectName()
+        PORT_NUMBER    = GetNextFreePort()
+        SCM_PROJECT    = GetScmProjectName()
+	CONTAINER_NAME = "SQLLinux${BRANCH_NAME}"
     }
         
     stages {
@@ -69,8 +70,35 @@ pipeline {
                 }
             }
         }
-        
-        stage('run tests') {
+
+	stage('run tests (Happy path)') {
+            when {
+                expression {
+                    return params.HAPPY_PATH
+                }
+            }
+            steps {
+                parallel (
+                    T1: {
+                        print "Executing test stream 1"
+                        bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -Q \"EXEC tSQLt.Run \'tSQLtHappyPath\'\""
+                        bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -y0 -Q \"SET NOCOUNT ON;EXEC tSQLt.XmlResultFormatter\" -o \"${WORKSPACE}\\${SCM_PROJECT}T1.xml\"" 
+                    },
+                    T2: {
+                        print "Executing test stream 2"
+                        bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -Q \"EXEC tSQLt.Run \'tSQLtHappyPath\'\""
+                        bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -y0 -Q \"SET NOCOUNT ON;EXEC tSQLt.XmlResultFormatter\" -o \"${WORKSPACE}\\${SCM_PROJECT}T2.xml\"" 
+                    }
+                )
+            }
+	}
+	            
+	stage('run tests (Un-happy path)') {
+            when {
+                expression {
+                    return !(params.HAPPY_PATH)
+                }
+            }
             steps {
                 parallel (
                     T1: {
@@ -84,7 +112,11 @@ pipeline {
                         bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -y0 -Q \"SET NOCOUNT ON;EXEC tSQLt.XmlResultFormatter\" -o \"${WORKSPACE}\\${SCM_PROJECT}T2.xml\"" 
                     }
                 )
-                
+            }
+        }
+		
+	stage('Merge JUNit xml files') {
+            steps {                
                 print "Merging JUnit xml files"
                 //
                 // junit-merge available from this GitHub repo:
