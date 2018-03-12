@@ -122,7 +122,7 @@ pipeline {
                 // junit-merge available from this GitHub repo:
                 // https://github.com/imsky/junit-merger 
                 //
-                bat "junit-merger ${WORKSPACE}\\*.xml > ${SCM_PROJECT}.xml"                    
+                bat "C:\\Projedcts\\junit-merger\\junit-merger.exe ${WORKSPACE}\\*.xml > ${SCM_PROJECT}.xml"                    
                 junit "${SCM_PROJECT}.xml"
             }
         }
