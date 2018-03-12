@@ -104,12 +104,12 @@ pipeline {
                     T1: {
                         print "Executing test stream 1"
                         bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -Q \"EXEC tSQLt.Run \'tSQLtUnhappyPath\'\""
-                        bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -y0 -Q \"SET NOCOUNT ON;EXEC tSQLt.XmlResultFormatter\" -o \"${WORKSPACE}\\${SCM_PROJECT}T1.xml\"" 
+                        bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -y0 -Q \"SET NOCOUNT ON;EXEC tSQLt.XmlResultFormatter\" -o \"${WORKSPACE}\\T1.xml\"" 
                     },
                     T2: {
                         print "Executing test stream 2"
                         bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -Q \"EXEC tSQLt.Run \'tSQLtHappyPath\'\""
-                        bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -y0 -Q \"SET NOCOUNT ON;EXEC tSQLt.XmlResultFormatter\" -o \"${WORKSPACE}\\${SCM_PROJECT}T2.xml\"" 
+                        bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -y0 -Q \"SET NOCOUNT ON;EXEC tSQLt.XmlResultFormatter\" -o \"${WORKSPACE}\\T2.xml\"" 
                     }
                 )
             }
@@ -122,7 +122,7 @@ pipeline {
                 // junit-merge available from this GitHub repo:
                 // https://github.com/imsky/junit-merger 
                 //
-                bat "C:\\Projects\\junit-merger\\junit-merger.exe ${WORKSPACE}\\*.xml > ${WORKSPACE}\\${SCM_PROJECT}.xml"                    
+                bat "junit-merger ${WORKSPACE}\\T1.xml ${WORKSPACE}\\T2.xml > ${WORKSPACE}\\${SCM_PROJECT}.xml"                    
                 junit "${WORKSPACE}\\${SCM_PROJECT}.xml"
             }
         }
