@@ -70,30 +70,8 @@ pipeline {
                 }
             }
         }
-
-	stage('run tests (Happy path)') {
-            when {
-                expression {
-                    return params.HAPPY_PATH
-                }
-            }
-            steps {
-                parallel (
-                    T1: {
-                        print "Executing test stream 1"
-                        bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -Q \"EXEC tSQLt.Run \'tSQLtUnhappyPath\'\""
-                        bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -y0 -Q \"SET NOCOUNT ON;EXEC tSQLt.XmlResultFormatter\" -o \"${WORKSPACE}\\${SCM_PROJECT}T1.xml\"" 
-                    },
-                    T2: {
-                        print "Executing test stream 2"
-                        bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -Q \"EXEC tSQLt.Run \'tSQLtHappyPath\'\""
-                        bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -y0 -Q \"SET NOCOUNT ON;EXEC tSQLt.XmlResultFormatter\" -o \"${WORKSPACE}\\${SCM_PROJECT}T2.xml\"" 
-                    }
-                )
-            }
-	}
 	            
-	stage('run tests (Un-happy path)') {
+	stage('run tests') {
             when {
                 expression {
                     return !(params.HAPPY_PATH)
@@ -110,7 +88,11 @@ pipeline {
                         bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -Q \"EXEC tSQLt.Run \'tSQLtHappyPath\'\""
                     }
                 )
+            }
+	}
 		
+	stage ('render test results') {
+            steps {
 		bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -y0 -Q \"SET NOCOUNT ON;EXEC tSQLt.XmlResultFormatter\" -o \"${WORKSPACE}\\${SCM_PROJECT}.xml\"" 
                 junit "${SCM_PROJECT}.xml"
             }
