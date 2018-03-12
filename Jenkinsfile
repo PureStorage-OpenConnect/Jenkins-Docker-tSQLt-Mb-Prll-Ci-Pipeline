@@ -104,28 +104,29 @@ pipeline {
                     T1: {
                         print "Executing test stream 1"
                         bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -Q \"EXEC tSQLt.Run \'tSQLtUnhappyPath\'\""
-                        bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -y0 -Q \"SET NOCOUNT ON;EXEC tSQLt.XmlResultFormatter\" -o \"$C:\\Projects\\junit-merger\\T1.xml\"" 
                     },
                     T2: {
                         print "Executing test stream 2"
                         bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -Q \"EXEC tSQLt.Run \'tSQLtHappyPath\'\""
-                        bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -y0 -Q \"SET NOCOUNT ON;EXEC tSQLt.XmlResultFormatter\" -o \"C:\\Projects\\junit-merger\\T2.xml\"" 
                     }
                 )
+		
+		bat "sqlcmd -S localhost,${PORT_NUMBER} -U sa -P P@ssword1 -d SsdtDevOpsDemo -y0 -Q \"SET NOCOUNT ON;EXEC tSQLt.XmlResultFormatter\" -o \"${WORKSPACE}\\${SCM_PROJECT}.xml\"" 
+                junit "${SCM_PROJECT}.xml"
             }
         }
 		
-	stage('Merge JUNit xml files') {
-            steps {                
-                print "Merging JUnit xml files"
+	//stage('Merge JUNit xml files') {
+            //steps {                
+                //print "Merging JUnit xml files"
                 //
                 // junit-merge available from this GitHub repo:
                 // https://github.com/imsky/junit-merger 
                 //
-                bat "C:\\Projects\\junit-merger\\junit-merger.exe C:\\Projects\\junit-merger\\T1.xml C:\\Projects\\junit-merger\\T2.xml >  C:\\Projects\\junit-merger\\merge.xml"                    
-                junit "C:\\Projects\\junit-merger\\merge.xml"
-            }
-        }
+                //bat "C:\\Projects\\junit-merger\\junit-merger.exe C:\\Projects\\junit-merger\\T1.xml C:\\Projects\\junit-merger\\T2.xml >  C:\\Projects\\junit-merger\\merge.xml"                    
+                //junit "C:\\Projects\\junit-merger\\merge.xml"
+            //}
+        //}
     }
     post {
         always {
