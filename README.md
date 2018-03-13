@@ -2,6 +2,7 @@ A SQL Server datatools projects with an associated Jenkinsfile written using the
 
 - Checks the project out from SCM
 - Uses msbuild to build the project into a DacPac file and spins up a container to deploy the DacPac to ** in parallel **
+  the container spun up will use a unique name, the name of the branch suffixed by SQLLinux and a unqiue external port
 - Deploys the DacPac to the container
 - Performs runs some tSQLt unit tests ** in parallel **
 - Renders the results to Jenkins using the JUnit plugin
