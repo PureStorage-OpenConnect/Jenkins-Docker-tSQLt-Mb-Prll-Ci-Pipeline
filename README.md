@@ -1,10 +1,10 @@
 # Pipeline This Repo Demonstrates
 
-![pipeline](https://user-images.githubusercontent.com/15145995/54473653-8618fe80-47d2-11e9-9a5f-284554be8904.png)
+![pipeline](https://user-images.githubusercontent.com/15145995/54473896-f5442200-47d5-11e9-915e-511c7a90eb58.png)
 
 # Code To Start Container and Create DACPAC In Parallel
 
-![parrallel 1](https://user-images.githubusercontent.com/15145995/54473896-f5442200-47d5-11e9-915e-511c7a90eb58.png)
+
 
 # Code To Run Tests In Parallel
 
