@@ -4,7 +4,7 @@
 
 # Code To Start Container and Create DACPAC In Parallel
 
-![parrallel 1](https://user-images.githubusercontent.com/15145995/46347575-faf0e580-c643-11e8-8735-eef5d8dccac5.PNG)
+![parrallel 1](https://user-images.githubusercontent.com/15145995/54473896-f5442200-47d5-11e9-915e-511c7a90eb58.png)
 
 # Code To Run Tests In Parallel
 
