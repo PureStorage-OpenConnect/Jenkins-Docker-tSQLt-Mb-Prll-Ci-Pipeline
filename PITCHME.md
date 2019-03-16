@@ -1,5 +1,5 @@
 # Pipeline
-![pipeline](https://user-images.githubusercontent.com/15145995/46347572-f75d5e80-c643-11e8-9576-d82a537309a4.PNG)
+![pipeline](https://user-images.githubusercontent.com/15145995/54473653-8618fe80-47d2-11e9-9a5f-284554be8904.png)
 ---
 # Code For //isation
 ![parrallel 1](https://user-images.githubusercontent.com/15145995/46347575-faf0e580-c643-11e8-8735-eef5d8dccac5.PNG)
